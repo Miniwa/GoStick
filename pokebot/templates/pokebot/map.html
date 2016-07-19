@@ -1,0 +1,33 @@
+<!DOCYPE html>
+<html>
+
+<head>
+    <title>Pokebot</title>
+    <meta name="viewport" content="initial-scale=1.0">
+    <meta charset="utf-8">
+
+    <style>
+        #pokebot-map {
+            height: 50%;
+        }
+    </style>
+    <script>
+        function initMap() {
+            map = new google.maps.Map(document.getElementById('pokebot-map'), {
+                center: {
+                    lat: -34.397,
+                    lng: 150.644
+                },
+                zoom: 8
+            });
+        }
+    </script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key={{ GMAPS_KEY }}&callback=initMap" async defer></script>
+</head>
+
+<body>
+    <div id="pokebot-map"></div>
+</body>
+
+</html>
