@@ -11,21 +11,11 @@
             height: 50%;
         }
     </style>
-    <script>
-        function initMap() {
-            map = new google.maps.Map(document.getElementById('pokebot-map'), {
-                center: {
-                    lat: -34.397,
-                    lng: 150.644
-                },
-                zoom: 8
-            });
-        }
-    </script>
-	{% load staticfiles %}
-	<script src='{% static "pokebot/pokebot.js" %}'></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
-    <script src="https://maps.googleapis.com/maps/api/js?key={{ GMAPS_KEY }}&callback=initMap" async defer></script>
+    {% load staticfiles %}
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js" defer></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key={{ GMAPS_KEY }}" defer></script>
+    <script src='{% static "pokebot/pokebot.js" %}' defer></script>
+    <script src='{% static "pokebot/map.js" %}' defer></script>
 </head>
 
 <body>
