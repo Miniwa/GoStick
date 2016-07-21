@@ -44,10 +44,22 @@ PB.Coordinate.prototype.LAT_MIN = -90;
 PB.Coordinate.prototype.LNG_MAX = 180;
 PB.Coordinate.prototype.LNG_MIN = -180;
 
-//Calculate the distance between two coordinates.
+//Returns the distance between two coordinates.
 PB.Coordinate.prototype.Dist = function(rhv) {
     return Math.abs(rhv.getLatitude() - this.getLatitude()) +
-        Math.abs(rhv.getlnggitude() - this.getlnggitude());
+        Math.abs(rhv.getLongitude() - this.getLongitude());
+};
+
+//Returns the length of the coordinate (distance from origin)
+PB.Coordinate.prototype.Length = function() {
+    return this.Dist(new Coordinate(0, 0));
+};
+
+//Returns a new Coordinate clamped to the specified threshold
+PB.Coordinate.prototype.Clamp = function(threshold) {
+    var dividant = this.Length() / threshold;
+    return new Coordinate(this.getLatitude() / dividant,
+        this.getLongitude() / dividant);
 };
 
 //Set latitude.
@@ -72,46 +84,42 @@ PB.Coordinate.prototype.getLongitude = function() {
 
 
 //Pokebot definitions.
+//Draws a marker at the specified coordinates with the specified title/identifier.
+PB.Pokebot.prototype.drawMarker = function(coord, title) {
+    title = title || "";
+    this._markers.push(new google.maps.Marker({
+        map: this._map,
+        position: {
+            lng: coord.getLongitude(),
+            lat: coord.getLatitude(),
+        },
+        title: title,
+    }));
+};
+
 //Sets the active target.
 PB.Pokebot.prototype.setTarget = function(coord) {
     this._target = coord;
     this.drawMarker(coord, "Target");
 };
 
-PB.Pokebot.prototype.getTarget = function()
-{
+PB.Pokebot.prototype.getTarget = function() {
     return this._target;
 };
 
-PB.Pokebot.prototype.setPosition = function(coord)
-{
-        this._position = coord;
-        this.drawMarker(coord, "Position");
+PB.Pokebot.prototype.setPosition = function(coord) {
+    this._position = coord;
+    this.drawMarker(coord, "Position");
 };
 
-PB.Pokebot.prototype.setCamera = function(coord)
-{
+PB.Pokebot.prototype.setCamera = function(coord) {
     this._map.setPosition({
         lat: coord.getLatitude(),
         lng: coord.getLongitude(),
     });
 };
 
-PB.Pokebot.prototype.getCamera = function()
-{
+PB.Pokebot.prototype.getCamera = function() {
     var pos = this._map.getPosition();
     return new PB.Coordinate(pos.lat(), pos.lng());
-};
-
-PB.Pokebot.prototype.drawMarker = function(coord, title)
-{
-    title = title || "";
-    this._markers.push(new google.maps.Marker({
-        map: this._map,
-        position: {
-            lng: coord.getLongitude(),
-            lat: coord.getLatitude()
-        },
-        title: title
-    }));
 };
