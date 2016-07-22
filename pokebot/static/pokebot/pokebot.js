@@ -20,10 +20,11 @@ var PB = (function() {
 
         //Pokebot declaration.
         //Initializes the pokebot with the camera pointed at the coordinates specified by coord.
-        Pokebot: function(selector, coord) {
+        Pokebot: function(selector, coord, zoom) {
             coord = coord || new Coordinate(0, 0);
+            zoom = zoom || 10;
 
-            this._markers = [];
+            this._markers = {};
             this._target = null;
             this._position = null;
 
@@ -32,7 +33,7 @@ var PB = (function() {
                     lat: coord.getLatitude(),
                     lng: coord.getLongitude(),
                 },
-                zoom: 10
+                zoom: zoom
             });
         },
     };
@@ -46,20 +47,36 @@ PB.Coordinate.prototype.LNG_MIN = -180;
 
 //Returns the distance between two coordinates.
 PB.Coordinate.prototype.Dist = function(rhv) {
-    return Math.abs(rhv.getLatitude() - this.getLatitude()) +
-        Math.abs(rhv.getLongitude() - this.getLongitude());
+    return Math.abs(this.getLatitude() - rhv.getLatitude()) +
+        Math.abs(this.getLongitude() - rhv.getLongitude());
+};
+
+//Returns the sum of two coordinates.
+PB.Coordinate.prototype.Add = function(rhv)
+{
+        return new PB.Coordinate(this.getLatitude() + rhv.getLatitude(),
+            this.getLongitude() + rhv.getLongitude());
 };
 
 //Returns the length of the coordinate (distance from origin)
 PB.Coordinate.prototype.Length = function() {
-    return this.Dist(new Coordinate(0, 0));
+    return this.Dist(new PB.Coordinate(0, 0));
 };
 
 //Returns a new Coordinate clamped to the specified threshold
 PB.Coordinate.prototype.Clamp = function(threshold) {
     var dividant = this.Length() / threshold;
-    return new Coordinate(this.getLatitude() / dividant,
+
+    return new PB.Coordinate(this.getLatitude() / dividant,
         this.getLongitude() / dividant);
+};
+
+//Returns a literal object representation of the coordinate.
+PB.Coordinate.prototype.toLatLng = function() {
+    return {
+        lat: this.getLatitude(),
+        lng: this.getLongitude()
+    };
 };
 
 //Set latitude.
@@ -85,16 +102,19 @@ PB.Coordinate.prototype.getLongitude = function() {
 
 //Pokebot definitions.
 //Draws a marker at the specified coordinates with the specified title/identifier.
-PB.Pokebot.prototype.drawMarker = function(coord, title) {
+PB.Pokebot.prototype.drawMarker = function(coord, id, title) {
     title = title || "";
-    this._markers.push(new google.maps.Marker({
-        map: this._map,
-        position: {
-            lng: coord.getLongitude(),
-            lat: coord.getLatitude(),
-        },
-        title: title,
-    }));
+
+    //If a marker already exists, only update the position instead of creating a whole new marker.
+    if (id in this._markers) {
+        this._markers[id].setPosition(coord.toLatLng());
+    } else {
+        this._markers[id] = new google.maps.Marker({
+            map: this._map,
+            position: coord.toLatLng(),
+            title: title,
+        });
+    }
 };
 
 //Sets the active target.
@@ -103,23 +123,30 @@ PB.Pokebot.prototype.setTarget = function(coord) {
     this.drawMarker(coord, "Target");
 };
 
+//Gets the active target.
 PB.Pokebot.prototype.getTarget = function() {
     return this._target;
 };
 
+//Sets the current position.
 PB.Pokebot.prototype.setPosition = function(coord) {
     this._position = coord;
     this.drawMarker(coord, "Position");
 };
 
-PB.Pokebot.prototype.setCamera = function(coord) {
-    this._map.setPosition({
-        lat: coord.getLatitude(),
-        lng: coord.getLongitude(),
-    });
+// Gets the current position.
+PB.Pokebot.prototype.getPosition = function()
+{
+    return this._position;
 };
 
+// Set the camera location.
+PB.Pokebot.prototype.setCamera = function(coord) {
+    this._map.setCenter(coord.toLatLng());
+};
+
+// Get the camera location.
 PB.Pokebot.prototype.getCamera = function() {
-    var pos = this._map.getPosition();
+    var pos = this._map.getCenter();
     return new PB.Coordinate(pos.lat(), pos.lng());
 };
