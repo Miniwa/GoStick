@@ -46,26 +46,26 @@ PB.Coordinate.prototype.LNG_MAX = 180;
 PB.Coordinate.prototype.LNG_MIN = -180;
 
 //Returns the distance between two coordinates.
-PB.Coordinate.prototype.Dist = function(rhv) {
+PB.Coordinate.prototype.dist = function(rhv) {
     return Math.abs(this.getLatitude() - rhv.getLatitude()) +
         Math.abs(this.getLongitude() - rhv.getLongitude());
 };
 
 //Returns the sum of two coordinates.
-PB.Coordinate.prototype.Add = function(rhv)
+PB.Coordinate.prototype.add = function(rhv)
 {
         return new PB.Coordinate(this.getLatitude() + rhv.getLatitude(),
             this.getLongitude() + rhv.getLongitude());
 };
 
 //Returns the length of the coordinate (distance from origin)
-PB.Coordinate.prototype.Length = function() {
-    return this.Dist(new PB.Coordinate(0, 0));
+PB.Coordinate.prototype.length = function() {
+    return this.dist(new PB.Coordinate(0, 0));
 };
 
 //Returns a new Coordinate clamped to the specified threshold
-PB.Coordinate.prototype.Clamp = function(threshold) {
-    var dividant = this.Length() / threshold;
+PB.Coordinate.prototype.clamp = function(threshold) {
+    var dividant = this.length() / threshold;
 
     return new PB.Coordinate(this.getLatitude() / dividant,
         this.getLongitude() / dividant);

@@ -14,8 +14,11 @@
     {% load staticfiles %}
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js" defer></script>
     <script src="https://maps.googleapis.com/maps/api/js?key={{ GMAPS_KEY }}" defer></script>
+    <script src="{% static 'pokebot/persistence.js' %}" defer></script>
     <script src="{% static 'pokebot/pokebot.js' %}" defer></script>
     <script src="{% static 'pokebot/map.js' %}" defer></script>
+
+    <input id="csrf-token" type="hidden" value="{{csrf_token}}">
 </head>
 
 <body>
